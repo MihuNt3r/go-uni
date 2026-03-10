@@ -12,6 +12,10 @@ type EnrollmentsRepository struct {
 	db *sql.DB
 }
 
+func NewEnrollmentsRepository(db *sql.DB) *EnrollmentsRepository {
+	return &EnrollmentsRepository{db: db}
+}
+
 func (r *EnrollmentsRepository) Enroll(ctx context.Context, enrollment models.Enrollment) error {
 	query := `
 		INSERT INTO enrollments (student_id, course_id)
