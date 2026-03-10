@@ -18,6 +18,14 @@ func NewCoursesHandler(repo *repository.CoursesRepository) *CoursesHandler {
 	return &CoursesHandler{repo: repo}
 }
 
+// List godoc
+// @Summary List courses
+// @Description Returns all courses.
+// @Tags courses
+// @Produce json
+// @Success 200 {array} models.Course
+// @Failure 500 {object} errorResponse
+// @Router /courses [get]
 func (h *CoursesHandler) List(w http.ResponseWriter, r *http.Request) {
 	courses, err := h.repo.GetAll(r.Context())
 	if err != nil {
@@ -28,6 +36,17 @@ func (h *CoursesHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, courses)
 }
 
+// Get godoc
+// @Summary Get course by ID
+// @Description Returns a single course by its ID.
+// @Tags courses
+// @Produce json
+// @Param id path int true "Course ID"
+// @Success 200 {object} models.Course
+// @Failure 400 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /courses/{id} [get]
 func (h *CoursesHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
@@ -48,6 +67,17 @@ func (h *CoursesHandler) Get(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, course)
 }
 
+// Create godoc
+// @Summary Create course
+// @Description Creates a new course.
+// @Tags courses
+// @Accept json
+// @Produce json
+// @Param request body models.Course true "Course payload"
+// @Success 201 {object} models.Course
+// @Failure 400 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /courses [post]
 func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var course models.Course
 	if err := decodeJSONBody(r, &course); err != nil {
@@ -67,6 +97,19 @@ func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, course)
 }
 
+// Update godoc
+// @Summary Update course
+// @Description Updates a course by ID.
+// @Tags courses
+// @Accept json
+// @Produce json
+// @Param id path int true "Course ID"
+// @Param request body models.Course true "Course payload"
+// @Success 200 {object} models.Course
+// @Failure 400 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /courses/{id} [put]
 func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
@@ -99,6 +142,17 @@ func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, course)
 }
 
+// Delete godoc
+// @Summary Delete course
+// @Description Deletes a course by ID.
+// @Tags courses
+// @Produce json
+// @Param id path int true "Course ID"
+// @Success 200 {object} messageResponse
+// @Failure 400 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /courses/{id} [delete]
 func (h *CoursesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
@@ -116,7 +170,7 @@ func (h *CoursesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]string{"message": "course deleted"})
+	writeJSON(w, http.StatusOK, messageResponse{Message: "course deleted"})
 }
 
 func validateCourse(course models.Course) error {

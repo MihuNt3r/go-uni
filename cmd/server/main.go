@@ -9,9 +9,14 @@ import (
 
 	_ "github.com/lib/pq"
 
+	_ "go-uni/docs"
 	"go-uni/internal/handlers"
 )
 
+// @title go-uni API
+// @version 1.0
+// @description University REST API for students, teachers, courses, and enrollments.
+// @BasePath /
 func main() {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"net/http"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+
 	"go-uni/internal/repository"
 )
 
@@ -40,6 +42,9 @@ func NewRouter(db *sql.DB) *http.ServeMux {
 
 	mux.HandleFunc("POST /students/{id}/courses/{course_id}", enrollmentsHandler.Enroll)
 	mux.HandleFunc("DELETE /students/{id}/courses/{course_id}", enrollmentsHandler.Unenroll)
+
+	mux.Handle("GET /swagger/", httpSwagger.Handler(httpSwagger.URL("/swagger/doc.json")))
+	mux.Handle("GET /swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
 
 	return mux
 }

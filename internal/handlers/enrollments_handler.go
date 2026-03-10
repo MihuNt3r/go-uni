@@ -17,6 +17,17 @@ func NewEnrollmentsHandler(repo *repository.EnrollmentsRepository) *EnrollmentsH
 	return &EnrollmentsHandler{repo: repo}
 }
 
+// Enroll godoc
+// @Summary Enroll student to course
+// @Description Creates student-course enrollment.
+// @Tags enrollments
+// @Produce json
+// @Param id path int true "Student ID"
+// @Param course_id path int true "Course ID"
+// @Success 201 {object} models.Enrollment
+// @Failure 400 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /students/{id}/courses/{course_id} [post]
 func (h *EnrollmentsHandler) Enroll(w http.ResponseWriter, r *http.Request) {
 	studentID, courseID, err := parseEnrollmentPathIDs(r)
 	if err != nil {
@@ -33,6 +44,18 @@ func (h *EnrollmentsHandler) Enroll(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, enrollment)
 }
 
+// Unenroll godoc
+// @Summary Unenroll student from course
+// @Description Removes student-course enrollment.
+// @Tags enrollments
+// @Produce json
+// @Param id path int true "Student ID"
+// @Param course_id path int true "Course ID"
+// @Success 200 {object} messageResponse
+// @Failure 400 {object} errorResponse
+// @Failure 404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /students/{id}/courses/{course_id} [delete]
 func (h *EnrollmentsHandler) Unenroll(w http.ResponseWriter, r *http.Request) {
 	studentID, courseID, err := parseEnrollmentPathIDs(r)
 	if err != nil {
@@ -50,7 +73,7 @@ func (h *EnrollmentsHandler) Unenroll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]string{"message": "student unenrolled"})
+	writeJSON(w, http.StatusOK, messageResponse{Message: "student unenrolled"})
 }
 
 func parseEnrollmentPathIDs(r *http.Request) (int64, int64, error) {
