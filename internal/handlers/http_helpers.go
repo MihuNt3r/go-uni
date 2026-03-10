@@ -4,7 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"reflect"
 	"strconv"
+	"strings"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type errorResponse struct {
@@ -14,6 +18,8 @@ type errorResponse struct {
 type messageResponse struct {
 	Message string `json:"message"`
 }
+
+var reqValidator = validator.New()
 
 func writeJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -64,4 +70,54 @@ func parsePathID(r *http.Request, name string) (int64, error) {
 	}
 
 	return parsePositiveID(raw)
+}
+
+func validatePayload(payload any) error {
+	err := reqValidator.Struct(payload)
+	if err == nil {
+		return nil
+	}
+
+	var validationErrs validator.ValidationErrors
+	if !errors.As(err, &validationErrs) || len(validationErrs) == 0 {
+		return errors.New("invalid request body")
+	}
+
+	firstErr := validationErrs[0]
+	fieldName := jsonFieldName(payload, firstErr.StructField())
+
+	switch firstErr.Tag() {
+	case "required":
+		return errors.New(fieldName + " is required")
+	case "email":
+		return errors.New(fieldName + " must be valid")
+	case "gt":
+		return errors.New(fieldName + " must be positive")
+	default:
+		return errors.New(fieldName + " is invalid")
+	}
+}
+
+func jsonFieldName(payload any, structFieldName string) string {
+	t := reflect.TypeOf(payload)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+
+	field, ok := t.FieldByName(structFieldName)
+	if !ok {
+		return strings.ToLower(structFieldName)
+	}
+
+	jsonTag := field.Tag.Get("json")
+	if jsonTag == "" || jsonTag == "-" {
+		return strings.ToLower(structFieldName)
+	}
+
+	parts := strings.Split(jsonTag, ",")
+	if parts[0] == "" {
+		return strings.ToLower(structFieldName)
+	}
+
+	return parts[0]
 }

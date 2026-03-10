@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
-	"strings"
 
 	"go-uni/internal/models"
 	"go-uni/internal/repository"
@@ -174,15 +173,5 @@ func (h *StudentsHandler) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func validateStudent(student models.Student) error {
-	if strings.TrimSpace(student.FirstName) == "" {
-		return errors.New("first_name is required")
-	}
-	if strings.TrimSpace(student.LastName) == "" {
-		return errors.New("last_name is required")
-	}
-	if strings.TrimSpace(student.Email) == "" {
-		return errors.New("email is required")
-	}
-
-	return nil
+	return validatePayload(student)
 }
