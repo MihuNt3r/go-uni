@@ -28,7 +28,7 @@ func NewStudentsHandler(repo *repository.StudentsRepository) *StudentsHandler {
 func (h *StudentsHandler) List(w http.ResponseWriter, r *http.Request) {
 	students, err := h.repo.GetAll(r.Context())
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to list students")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to list students")
 		return
 	}
 
@@ -49,17 +49,17 @@ func (h *StudentsHandler) List(w http.ResponseWriter, r *http.Request) {
 func (h *StudentsHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid student id")
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid student id")
 		return
 	}
 
 	student, getErr := h.repo.GetByID(r.Context(), id)
 	if getErr != nil {
-		writeError(w, http.StatusInternalServerError, "failed to get student")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to get student")
 		return
 	}
 	if student == nil {
-		writeError(w, http.StatusNotFound, "student not found")
+		_ = writeJSONError(w, http.StatusNotFound, "student not found")
 		return
 	}
 
@@ -79,17 +79,17 @@ func (h *StudentsHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Router /students [post]
 func (h *StudentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var student models.Student
-	if err := decodeJSONBody(r, &student); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid JSON body")
+	if err := readJSON(w, r, &student); err != nil {
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
 	if validationErr := validateStudent(student); validationErr != nil {
-		writeError(w, http.StatusBadRequest, validationErr.Error())
+		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
 
 	if err := h.repo.Create(r.Context(), &student); err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to create student")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to create student")
 		return
 	}
 
@@ -112,29 +112,29 @@ func (h *StudentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 func (h *StudentsHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid student id")
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid student id")
 		return
 	}
 
 	var student models.Student
-	if err := decodeJSONBody(r, &student); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid JSON body")
+	if err := readJSON(w, r, &student); err != nil {
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
 	student.ID = id
 
 	if validationErr := validateStudent(student); validationErr != nil {
-		writeError(w, http.StatusBadRequest, validationErr.Error())
+		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
 
 	err = h.repo.Update(r.Context(), student)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			writeError(w, http.StatusNotFound, "student not found")
+			_ = writeJSONError(w, http.StatusNotFound, "student not found")
 			return
 		}
-		writeError(w, http.StatusInternalServerError, "failed to update student")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to update student")
 		return
 	}
 
@@ -155,17 +155,17 @@ func (h *StudentsHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *StudentsHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid student id")
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid student id")
 		return
 	}
 
 	err = h.repo.Delete(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			writeError(w, http.StatusNotFound, "student not found")
+			_ = writeJSONError(w, http.StatusNotFound, "student not found")
 			return
 		}
-		writeError(w, http.StatusInternalServerError, "failed to delete student")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to delete student")
 		return
 	}
 

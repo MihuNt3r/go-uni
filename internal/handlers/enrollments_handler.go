@@ -31,13 +31,13 @@ func NewEnrollmentsHandler(repo *repository.EnrollmentsRepository) *EnrollmentsH
 func (h *EnrollmentsHandler) Enroll(w http.ResponseWriter, r *http.Request) {
 	studentID, courseID, err := parseEnrollmentPathIDs(r)
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid student/course path")
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid student/course path")
 		return
 	}
 
 	enrollment := models.Enrollment{StudentID: studentID, CourseID: courseID}
 	if err := h.repo.Enroll(r.Context(), enrollment); err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to enroll student")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to enroll student")
 		return
 	}
 
@@ -59,17 +59,17 @@ func (h *EnrollmentsHandler) Enroll(w http.ResponseWriter, r *http.Request) {
 func (h *EnrollmentsHandler) Unenroll(w http.ResponseWriter, r *http.Request) {
 	studentID, courseID, err := parseEnrollmentPathIDs(r)
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid student/course path")
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid student/course path")
 		return
 	}
 
 	err = h.repo.Unenroll(r.Context(), studentID, courseID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			writeError(w, http.StatusNotFound, "enrollment not found")
+			_ = writeJSONError(w, http.StatusNotFound, "enrollment not found")
 			return
 		}
-		writeError(w, http.StatusInternalServerError, "failed to unenroll student")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to unenroll student")
 		return
 	}
 

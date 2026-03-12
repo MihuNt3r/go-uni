@@ -28,7 +28,7 @@ func NewCoursesHandler(repo *repository.CoursesRepository) *CoursesHandler {
 func (h *CoursesHandler) List(w http.ResponseWriter, r *http.Request) {
 	courses, err := h.repo.GetAll(r.Context())
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to list courses")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to list courses")
 		return
 	}
 
@@ -49,17 +49,17 @@ func (h *CoursesHandler) List(w http.ResponseWriter, r *http.Request) {
 func (h *CoursesHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid course id")
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid course id")
 		return
 	}
 
 	course, getErr := h.repo.GetByID(r.Context(), id)
 	if getErr != nil {
-		writeError(w, http.StatusInternalServerError, "failed to get course")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to get course")
 		return
 	}
 	if course == nil {
-		writeError(w, http.StatusNotFound, "course not found")
+		_ = writeJSONError(w, http.StatusNotFound, "course not found")
 		return
 	}
 
@@ -79,17 +79,17 @@ func (h *CoursesHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Router /courses [post]
 func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var course models.Course
-	if err := decodeJSONBody(r, &course); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid JSON body")
+	if err := readJSON(w, r, &course); err != nil {
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
 	if validationErr := validateCourse(course); validationErr != nil {
-		writeError(w, http.StatusBadRequest, validationErr.Error())
+		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
 
 	if err := h.repo.Create(r.Context(), &course); err != nil {
-		writeError(w, http.StatusInternalServerError, "failed to create course")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to create course")
 		return
 	}
 
@@ -112,29 +112,29 @@ func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid course id")
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid course id")
 		return
 	}
 
 	var course models.Course
-	if err := decodeJSONBody(r, &course); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid JSON body")
+	if err := readJSON(w, r, &course); err != nil {
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
 	course.ID = id
 
 	if validationErr := validateCourse(course); validationErr != nil {
-		writeError(w, http.StatusBadRequest, validationErr.Error())
+		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
 
 	err = h.repo.Update(r.Context(), course)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			writeError(w, http.StatusNotFound, "course not found")
+			_ = writeJSONError(w, http.StatusNotFound, "course not found")
 			return
 		}
-		writeError(w, http.StatusInternalServerError, "failed to update course")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to update course")
 		return
 	}
 
@@ -155,17 +155,17 @@ func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *CoursesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "invalid course id")
+		_ = writeJSONError(w, http.StatusBadRequest, "invalid course id")
 		return
 	}
 
 	err = h.repo.Delete(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			writeError(w, http.StatusNotFound, "course not found")
+			_ = writeJSONError(w, http.StatusNotFound, "course not found")
 			return
 		}
-		writeError(w, http.StatusInternalServerError, "failed to delete course")
+		_ = writeJSONError(w, http.StatusInternalServerError, "failed to delete course")
 		return
 	}
 

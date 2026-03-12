@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"reflect"
@@ -17,38 +16,6 @@ type errorResponse struct {
 
 type messageResponse struct {
 	Message string `json:"message"`
-}
-
-var reqValidator = validator.New()
-
-func writeJSON(w http.ResponseWriter, status int, payload any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-
-	if payload == nil {
-		return
-	}
-
-	_ = json.NewEncoder(w).Encode(payload)
-}
-
-func writeError(w http.ResponseWriter, status int, message string) {
-	writeJSON(w, status, errorResponse{Error: message})
-}
-
-func decodeJSONBody(r *http.Request, dst any) error {
-	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields()
-
-	if err := decoder.Decode(dst); err != nil {
-		return err
-	}
-
-	if err := decoder.Decode(&struct{}{}); err == nil {
-		return errors.New("request body must contain a single JSON object")
-	}
-
-	return nil
 }
 
 func parsePositiveID(raw string) (int64, error) {
@@ -73,7 +40,7 @@ func parsePathID(r *http.Request, name string) (int64, error) {
 }
 
 func validatePayload(payload any) error {
-	err := reqValidator.Struct(payload)
+	err := Validate.Struct(payload)
 	if err == nil {
 		return nil
 	}
