@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 	"time"
@@ -9,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 
 	_ "go-uni/docs"
+	"go-uni/internal/database"
 	"go-uni/internal/env"
 	"go-uni/internal/handlers"
 )
@@ -20,11 +20,10 @@ import (
 func main() {
 	dbAddr := env.GetString("DB_ADDR", "postgres://admin:postgres@localhost:5432/uni_db?sslmode=disable")
 
-	db, err := sql.Open("postgres", dbAddr)
+	db, err := database.New(dbAddr, 5, 5)
 	if err != nil {
-		log.Fatalf("failed to open database: %v", err)
+		log.Fatalf("error connecting to database: %s", err)
 	}
-	defer db.Close()
 
 	addr := env.GetString("HTTP_ADDR", ":8080")
 
