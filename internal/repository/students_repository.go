@@ -13,6 +13,10 @@ type StudentsRepository struct {
 	db *sql.DB
 }
 
+func NewStudentsRepository(db *sql.DB) *StudentsRepository {
+	return &StudentsRepository{db: db}
+}
+
 func (r *StudentsRepository) Create(ctx context.Context, student *models.Student) error {
 	if student == nil {
 		return errors.New("student is nil")
