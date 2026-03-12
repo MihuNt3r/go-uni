@@ -20,6 +20,45 @@ definitions:
         type: integer
       title:
         type: string
+    required:
+    - title
+    type: object
+  models.CreateUpdateCourseRequest:
+    properties:
+      description:
+        type: string
+      teacher_id:
+        type: integer
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  models.CreateUpdateStudentRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    type: object
+  models.CreateUpdateTeacherRequest:
+    properties:
+      department:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+    required:
+    - department
+    - first_name
+    - last_name
     type: object
   models.Enrollment:
     properties:
@@ -38,6 +77,10 @@ definitions:
         type: integer
       last_name:
         type: string
+    required:
+    - email
+    - first_name
+    - last_name
     type: object
   models.Teacher:
     properties:
@@ -49,6 +92,10 @@ definitions:
         type: integer
       last_name:
         type: string
+    required:
+    - department
+    - first_name
+    - last_name
     type: object
 info:
   contact: {}
@@ -85,7 +132,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.Course'
+          $ref: '#/definitions/models.CreateUpdateCourseRequest'
       produces:
       - application/json
       responses:
@@ -180,7 +227,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.Course'
+          $ref: '#/definitions/models.CreateUpdateCourseRequest'
       produces:
       - application/json
       responses:
@@ -232,7 +279,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.Student'
+          $ref: '#/definitions/models.CreateUpdateStudentRequest'
       produces:
       - application/json
       responses:
@@ -327,7 +374,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.Student'
+          $ref: '#/definitions/models.CreateUpdateStudentRequest'
       produces:
       - application/json
       responses:
@@ -446,7 +493,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.Teacher'
+          $ref: '#/definitions/models.CreateUpdateTeacherRequest'
       produces:
       - application/json
       responses:
@@ -541,7 +588,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.Teacher'
+          $ref: '#/definitions/models.CreateUpdateTeacherRequest'
       produces:
       - application/json
       responses:

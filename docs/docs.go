@@ -62,7 +62,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Course"
+                            "$ref": "#/definitions/models.CreateUpdateCourseRequest"
                         }
                     }
                 ],
@@ -160,7 +160,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Course"
+                            "$ref": "#/definitions/models.CreateUpdateCourseRequest"
                         }
                     }
                 ],
@@ -284,7 +284,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Student"
+                            "$ref": "#/definitions/models.CreateUpdateStudentRequest"
                         }
                     }
                 ],
@@ -382,7 +382,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Student"
+                            "$ref": "#/definitions/models.CreateUpdateStudentRequest"
                         }
                     }
                 ],
@@ -606,7 +606,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Teacher"
+                            "$ref": "#/definitions/models.CreateUpdateTeacherRequest"
                         }
                     }
                 ],
@@ -704,7 +704,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Teacher"
+                            "$ref": "#/definitions/models.CreateUpdateTeacherRequest"
                         }
                     }
                 ],
@@ -801,6 +801,9 @@ const docTemplate = `{
         },
         "models.Course": {
             "type": "object",
+            "required": [
+                "title"
+            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -812,6 +815,61 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateUpdateCourseRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "teacher_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateUpdateStudentRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateUpdateTeacherRequest": {
+            "type": "object",
+            "required": [
+                "department",
+                "first_name",
+                "last_name"
+            ],
+            "properties": {
+                "department": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
                     "type": "string"
                 }
             }
@@ -829,6 +887,11 @@ const docTemplate = `{
         },
         "models.Student": {
             "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -846,6 +909,11 @@ const docTemplate = `{
         },
         "models.Teacher": {
             "type": "object",
+            "required": [
+                "department",
+                "first_name",
+                "last_name"
+            ],
             "properties": {
                 "department": {
                     "type": "string"

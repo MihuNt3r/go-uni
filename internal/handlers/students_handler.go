@@ -72,17 +72,24 @@ func (h *StudentsHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Tags students
 // @Accept json
 // @Produce json
-// @Param request body models.Student true "Student payload"
+// @Param request body models.CreateUpdateStudentRequest true "Student payload"
 // @Success 201 {object} models.Student
 // @Failure 400 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /students [post]
 func (h *StudentsHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var student models.Student
-	if err := readJSON(w, r, &student); err != nil {
+	var req models.CreateUpdateStudentRequest
+	if err := readJSON(w, r, &req); err != nil {
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
+
+	student := models.Student{
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+	}
+
 	if validationErr := validateStudent(student); validationErr != nil {
 		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
@@ -103,7 +110,7 @@ func (h *StudentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param id path int true "Student ID"
-// @Param request body models.Student true "Student payload"
+// @Param request body models.CreateUpdateStudentRequest true "Student payload"
 // @Success 200 {object} models.Student
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
@@ -116,12 +123,18 @@ func (h *StudentsHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var student models.Student
-	if err := readJSON(w, r, &student); err != nil {
+	var req models.CreateUpdateStudentRequest
+	if err := readJSON(w, r, &req); err != nil {
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
-	student.ID = id
+
+	student := models.Student{
+		ID:        id,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+	}
 
 	if validationErr := validateStudent(student); validationErr != nil {
 		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
