@@ -32,7 +32,7 @@ func (h *CoursesHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, courses)
+	jsonResponse(w, http.StatusOK, courses)
 }
 
 // Get godoc
@@ -93,7 +93,7 @@ func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, course)
+	jsonResponse(w, http.StatusCreated, course)
 }
 
 // Update godoc
@@ -138,7 +138,7 @@ func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, course)
+	jsonResponse(w, http.StatusOK, course)
 }
 
 // Delete godoc
@@ -169,7 +169,7 @@ func (h *CoursesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, messageResponse{Message: "course deleted"})
+	jsonResponse(w, http.StatusOK, messageResponse{Message: "course deleted"})
 }
 
 func validateCourse(course models.Course) error {

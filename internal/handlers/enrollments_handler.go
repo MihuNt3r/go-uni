@@ -41,7 +41,7 @@ func (h *EnrollmentsHandler) Enroll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, enrollment)
+	jsonResponse(w, http.StatusCreated, enrollment)
 }
 
 // Unenroll godoc
@@ -73,7 +73,7 @@ func (h *EnrollmentsHandler) Unenroll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, messageResponse{Message: "student unenrolled"})
+	jsonResponse(w, http.StatusOK, messageResponse{Message: "student unenrolled"})
 }
 
 func parseEnrollmentPathIDs(r *http.Request) (int64, int64, error) {

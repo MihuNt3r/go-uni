@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	_ "github.com/lib/pq"
 
 	_ "go-uni/docs"
+	"go-uni/internal/env"
 	"go-uni/internal/handlers"
 )
 
@@ -18,25 +18,15 @@ import (
 // @description University REST API for students, teachers, courses, and enrollments.
 // @BasePath /
 func main() {
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		log.Fatal("DATABASE_URL is required")
-	}
+	dbAddr := env.GetString("DB_ADDR", "postgres://admin:postgres@localhost:5432/uni_db?sslmode=disable")
 
-	db, err := sql.Open("postgres", dsn)
+	db, err := sql.Open("postgres", dbAddr)
 	if err != nil {
 		log.Fatalf("failed to open database: %v", err)
 	}
 	defer db.Close()
 
-	if pingErr := db.Ping(); pingErr != nil {
-		log.Fatalf("failed to ping database: %v", pingErr)
-	}
-
-	addr := os.Getenv("HTTP_ADDR")
-	if addr == "" {
-		addr = ":8080"
-	}
+	addr := env.GetString("HTTP_ADDR", ":8080")
 
 	server := &http.Server{
 		Addr:              addr,
