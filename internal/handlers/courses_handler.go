@@ -63,7 +63,7 @@ func (h *CoursesHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, course)
+	jsonResponse(w, http.StatusOK, course)
 }
 
 // Create godoc

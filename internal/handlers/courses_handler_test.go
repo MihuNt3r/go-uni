@@ -47,10 +47,10 @@ func TestCoursesHandler_List(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
-		assert.JSONEq(t, `[
+		assert.JSONEq(t, `{"data":[
 			{"id":1,"title":"Math","description":"Algebra","teacher_id":2},
 			{"id":2,"title":"Physics","description":"Mechanics","teacher_id":3}
-		]`, rr.Body.String())
+		]}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 
@@ -116,7 +116,7 @@ func TestCoursesHandler_Get(t *testing.T) {
 		rr := executeRequest(mux, http.MethodGet, "/courses/1", "")
 
 		require.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"id":1,"title":"Math","description":"Algebra","teacher_id":2}`, rr.Body.String())
+		assert.JSONEq(t, `{"data":{"id":1,"title":"Math","description":"Algebra","teacher_id":2}}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }
@@ -167,7 +167,7 @@ func TestCoursesHandler_Create(t *testing.T) {
 		rr := executeRequest(mux, http.MethodPost, "/courses", `{"title":"Math","description":"Algebra","teacher_id":2}`)
 
 		require.Equal(t, http.StatusCreated, rr.Code)
-		assert.JSONEq(t, `{"id":11,"title":"Math","description":"Algebra","teacher_id":2}`, rr.Body.String())
+		assert.JSONEq(t, `{"data":{"id":11,"title":"Math","description":"Algebra","teacher_id":2}}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }
@@ -241,7 +241,7 @@ func TestCoursesHandler_Update(t *testing.T) {
 		rr := executeRequest(mux, http.MethodPut, "/courses/1", `{"title":"Math","description":"Algebra","teacher_id":2}`)
 
 		require.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"id":1,"title":"Math","description":"Algebra","teacher_id":2}`, rr.Body.String())
+		assert.JSONEq(t, `{"data":{"id":1,"title":"Math","description":"Algebra","teacher_id":2}}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }
@@ -291,7 +291,7 @@ func TestCoursesHandler_Delete(t *testing.T) {
 		rr := executeRequest(mux, http.MethodDelete, "/courses/1", "")
 
 		require.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"message":"course deleted"}`, rr.Body.String())
+		assert.JSONEq(t, `{"data": {"message":"course deleted"}}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }

@@ -47,10 +47,10 @@ func TestStudentsHandler_List(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
-		assert.JSONEq(t, `[
+		assert.JSONEq(t, `{"data":[
 			{"id":1,"first_name":"John","last_name":"Doe","email":"john@example.com"},
 			{"id":2,"first_name":"Jane","last_name":"Smith","email":"jane@example.com"}
-		]`, rr.Body.String())
+		]}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 
@@ -116,7 +116,7 @@ func TestStudentsHandler_Get(t *testing.T) {
 		rr := executeRequest(mux, http.MethodGet, "/students/1", "")
 
 		require.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"id":1,"first_name":"John","last_name":"Doe","email":"john@example.com"}`, rr.Body.String())
+		assert.JSONEq(t, `{"data":{"id":1,"first_name":"John","last_name":"Doe","email":"john@example.com"}}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }
@@ -167,7 +167,7 @@ func TestStudentsHandler_Create(t *testing.T) {
 		rr := executeRequest(mux, http.MethodPost, "/students", `{"first_name":"John","last_name":"Doe","email":"john@example.com"}`)
 
 		require.Equal(t, http.StatusCreated, rr.Code)
-		assert.JSONEq(t, `{"id":11,"first_name":"John","last_name":"Doe","email":"john@example.com"}`, rr.Body.String())
+		assert.JSONEq(t, `{"data":{"id":11,"first_name":"John","last_name":"Doe","email":"john@example.com"}}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }
@@ -241,7 +241,7 @@ func TestStudentsHandler_Update(t *testing.T) {
 		rr := executeRequest(mux, http.MethodPut, "/students/1", `{"first_name":"John","last_name":"Doe","email":"john@example.com"}`)
 
 		require.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"id":1,"first_name":"John","last_name":"Doe","email":"john@example.com"}`, rr.Body.String())
+		assert.JSONEq(t, `{"data":{"id":1,"first_name":"John","last_name":"Doe","email":"john@example.com"}}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }
@@ -291,7 +291,7 @@ func TestStudentsHandler_Delete(t *testing.T) {
 		rr := executeRequest(mux, http.MethodDelete, "/students/1", "")
 
 		require.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"message":"student deleted"}`, rr.Body.String())
+		assert.JSONEq(t, `{"data":{"message":"student deleted"}}`, rr.Body.String())
 		require.NoError(t, mock.ExpectationsWereMet())
 	})
 }
