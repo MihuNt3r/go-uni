@@ -78,8 +78,10 @@ func (h *TeachersHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param request body models.CreateUpdateTeacherRequest true "Teacher payload"
+// @Security BearerAuth
 // @Success 201 {object} models.Teacher
 // @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /teachers [post]
 func (h *TeachersHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -119,9 +121,11 @@ func (h *TeachersHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path int true "Teacher ID"
 // @Param request body models.CreateUpdateTeacherRequest true "Teacher payload"
+// @Security BearerAuth
 // @Success 200 {object} models.Teacher
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /teachers/{id} [put]
 func (h *TeachersHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -173,9 +177,11 @@ func (h *TeachersHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Tags teachers
 // @Produce json
 // @Param id path int true "Teacher ID"
+// @Security BearerAuth
 // @Success 200 {object} messageResponse
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /teachers/{id} [delete]
 func (h *TeachersHandler) Delete(w http.ResponseWriter, r *http.Request) {

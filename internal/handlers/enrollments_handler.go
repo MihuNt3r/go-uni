@@ -25,8 +25,10 @@ func NewEnrollmentsHandler(repo *repository.EnrollmentsRepository) *EnrollmentsH
 // @Produce json
 // @Param id path int true "Student ID"
 // @Param course_id path int true "Course ID"
+// @Security BearerAuth
 // @Success 201 {object} models.Enrollment
 // @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /students/{id}/courses/{course_id} [post]
 func (h *EnrollmentsHandler) Enroll(w http.ResponseWriter, r *http.Request) {
@@ -54,9 +56,11 @@ func (h *EnrollmentsHandler) Enroll(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path int true "Student ID"
 // @Param course_id path int true "Course ID"
+// @Security BearerAuth
 // @Success 200 {object} messageResponse
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /students/{id}/courses/{course_id} [delete]
 func (h *EnrollmentsHandler) Unenroll(w http.ResponseWriter, r *http.Request) {

@@ -78,8 +78,10 @@ func (h *CoursesHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param request body models.CreateUpdateCourseRequest true "Course payload"
+// @Security BearerAuth
 // @Success 201 {object} models.Course
 // @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /courses [post]
 func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -119,9 +121,11 @@ func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path int true "Course ID"
 // @Param request body models.CreateUpdateCourseRequest true "Course payload"
+// @Security BearerAuth
 // @Success 200 {object} models.Course
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /courses/{id} [put]
 func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -173,9 +177,11 @@ func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Tags courses
 // @Produce json
 // @Param id path int true "Course ID"
+// @Security BearerAuth
 // @Success 200 {object} messageResponse
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /courses/{id} [delete]
 func (h *CoursesHandler) Delete(w http.ResponseWriter, r *http.Request) {

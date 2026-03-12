@@ -12,13 +12,12 @@ import (
 
 type AuthConfig struct {
 	JWTSecret string
-	APIKey    string
 }
 
 func AuthMiddleware(cfg AuthConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if isValidJWT(cfg.JWTSecret, bearerTokenFromHeader(r.Header.Get("Authorization"))) || isValidAPIKey(cfg.APIKey, r.Header.Get("X-API-Key")) {
+			if isValidJWT(cfg.JWTSecret, bearerTokenFromHeader(r.Header.Get("Authorization"))) {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -60,14 +59,6 @@ func isValidJWT(secret, tokenString string) bool {
 	}
 
 	return token.Valid
-}
-
-func isValidAPIKey(expected, provided string) bool {
-	if expected == "" {
-		return false
-	}
-
-	return provided == expected
 }
 
 func bearerTokenFromHeader(headerValue string) string {

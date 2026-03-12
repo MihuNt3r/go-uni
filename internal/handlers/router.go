@@ -31,7 +31,6 @@ func NewRouter(db *sql.DB) http.Handler {
 
 	authMiddleware := middleware.AuthMiddleware(middleware.AuthConfig{
 		JWTSecret: env.GetString("AUTH_JWT_SECRET", "change-me"),
-		APIKey:    env.GetString("AUTH_API_KEY", ""),
 	})
 
 	mux := http.NewServeMux()

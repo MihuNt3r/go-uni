@@ -17,6 +17,10 @@ import (
 // @version 1.0
 // @description University REST API for students, teachers, courses, and enrollments.
 // @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Use format: Bearer {token}
 func main() {
 	dbAddr := env.GetString("DB_ADDR", "postgres://admin:postgres@localhost:5432/uni_db?sslmode=disable")
 
