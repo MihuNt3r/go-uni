@@ -7,9 +7,10 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	"go-uni/internal/repository"
+	"go-uni/pkg/middleware"
 )
 
-func NewRouter(db *sql.DB) *http.ServeMux {
+func NewRouter(db *sql.DB) http.Handler {
 	studentsRepo := repository.NewStudentsRepository(db)
 	teachersRepo := repository.NewTeachersRepository(db)
 	coursesRepo := repository.NewCoursesRepository(db)
@@ -46,5 +47,5 @@ func NewRouter(db *sql.DB) *http.ServeMux {
 	mux.Handle("GET /swagger/", httpSwagger.Handler(httpSwagger.URL("/swagger/doc.json")))
 	mux.Handle("GET /swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
 
-	return mux
+	return middleware.RequestLoggingMiddleware(mux)
 }

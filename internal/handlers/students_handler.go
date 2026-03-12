@@ -7,6 +7,7 @@ import (
 
 	"go-uni/internal/models"
 	"go-uni/internal/repository"
+	"go-uni/pkg/middleware"
 )
 
 type StudentsHandler struct {
@@ -28,6 +29,7 @@ func NewStudentsHandler(repo *repository.StudentsRepository) *StudentsHandler {
 func (h *StudentsHandler) List(w http.ResponseWriter, r *http.Request) {
 	students, err := h.repo.GetAll(r.Context())
 	if err != nil {
+		middleware.LogHandlerError(r, "failed to list students", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to list students")
 		return
 	}
@@ -49,16 +51,19 @@ func (h *StudentsHandler) List(w http.ResponseWriter, r *http.Request) {
 func (h *StudentsHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid student id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid student id")
 		return
 	}
 
 	student, getErr := h.repo.GetByID(r.Context(), id)
 	if getErr != nil {
+		middleware.LogHandlerError(r, "failed to get student", getErr)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to get student")
 		return
 	}
 	if student == nil {
+		middleware.LogHandlerError(r, "student not found", nil)
 		_ = writeJSONError(w, http.StatusNotFound, "student not found")
 		return
 	}
@@ -80,6 +85,7 @@ func (h *StudentsHandler) Get(w http.ResponseWriter, r *http.Request) {
 func (h *StudentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateUpdateStudentRequest
 	if err := readJSON(w, r, &req); err != nil {
+		middleware.LogHandlerError(r, "invalid JSON body", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
@@ -91,11 +97,13 @@ func (h *StudentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if validationErr := validateStudent(student); validationErr != nil {
+		middleware.LogHandlerError(r, "student validation failed", validationErr)
 		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
 
 	if err := h.repo.Create(r.Context(), &student); err != nil {
+		middleware.LogHandlerError(r, "failed to create student", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to create student")
 		return
 	}
@@ -119,12 +127,14 @@ func (h *StudentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 func (h *StudentsHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid student id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid student id")
 		return
 	}
 
 	var req models.CreateUpdateStudentRequest
 	if err := readJSON(w, r, &req); err != nil {
+		middleware.LogHandlerError(r, "invalid JSON body", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
@@ -137,6 +147,7 @@ func (h *StudentsHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if validationErr := validateStudent(student); validationErr != nil {
+		middleware.LogHandlerError(r, "student validation failed", validationErr)
 		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
@@ -144,9 +155,11 @@ func (h *StudentsHandler) Update(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Update(r.Context(), student)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			middleware.LogHandlerError(r, "student not found", err)
 			_ = writeJSONError(w, http.StatusNotFound, "student not found")
 			return
 		}
+		middleware.LogHandlerError(r, "failed to update student", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to update student")
 		return
 	}
@@ -168,6 +181,7 @@ func (h *StudentsHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *StudentsHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid student id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid student id")
 		return
 	}
@@ -175,9 +189,11 @@ func (h *StudentsHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Delete(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			middleware.LogHandlerError(r, "student not found", err)
 			_ = writeJSONError(w, http.StatusNotFound, "student not found")
 			return
 		}
+		middleware.LogHandlerError(r, "failed to delete student", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to delete student")
 		return
 	}
