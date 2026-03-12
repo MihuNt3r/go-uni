@@ -7,6 +7,7 @@ import (
 
 	"go-uni/internal/models"
 	"go-uni/internal/repository"
+	"go-uni/pkg/middleware"
 )
 
 type TeachersHandler struct {
@@ -28,6 +29,7 @@ func NewTeachersHandler(repo *repository.TeachersRepository) *TeachersHandler {
 func (h *TeachersHandler) List(w http.ResponseWriter, r *http.Request) {
 	teachers, err := h.repo.GetAll(r.Context())
 	if err != nil {
+		middleware.LogHandlerError(r, "failed to list teachers", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to list teachers")
 		return
 	}
@@ -49,16 +51,19 @@ func (h *TeachersHandler) List(w http.ResponseWriter, r *http.Request) {
 func (h *TeachersHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid teacher id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid teacher id")
 		return
 	}
 
 	teacher, getErr := h.repo.GetByID(r.Context(), id)
 	if getErr != nil {
+		middleware.LogHandlerError(r, "failed to get teacher", getErr)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to get teacher")
 		return
 	}
 	if teacher == nil {
+		middleware.LogHandlerError(r, "teacher not found", nil)
 		_ = writeJSONError(w, http.StatusNotFound, "teacher not found")
 		return
 	}
@@ -73,13 +78,16 @@ func (h *TeachersHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param request body models.CreateUpdateTeacherRequest true "Teacher payload"
+// @Security BearerAuth
 // @Success 201 {object} models.Teacher
 // @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /teachers [post]
 func (h *TeachersHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateUpdateTeacherRequest
 	if err := readJSON(w, r, &req); err != nil {
+		middleware.LogHandlerError(r, "invalid JSON body", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
@@ -91,11 +99,13 @@ func (h *TeachersHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if validationErr := validateTeacher(teacher); validationErr != nil {
+		middleware.LogHandlerError(r, "teacher validation failed", validationErr)
 		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
 
 	if err := h.repo.Create(r.Context(), &teacher); err != nil {
+		middleware.LogHandlerError(r, "failed to create teacher", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to create teacher")
 		return
 	}
@@ -111,20 +121,24 @@ func (h *TeachersHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path int true "Teacher ID"
 // @Param request body models.CreateUpdateTeacherRequest true "Teacher payload"
+// @Security BearerAuth
 // @Success 200 {object} models.Teacher
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /teachers/{id} [put]
 func (h *TeachersHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid teacher id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid teacher id")
 		return
 	}
 
 	var req models.CreateUpdateTeacherRequest
 	if err := readJSON(w, r, &req); err != nil {
+		middleware.LogHandlerError(r, "invalid JSON body", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
@@ -137,6 +151,7 @@ func (h *TeachersHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if validationErr := validateTeacher(teacher); validationErr != nil {
+		middleware.LogHandlerError(r, "teacher validation failed", validationErr)
 		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
@@ -144,9 +159,11 @@ func (h *TeachersHandler) Update(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Update(r.Context(), teacher)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			middleware.LogHandlerError(r, "teacher not found", err)
 			_ = writeJSONError(w, http.StatusNotFound, "teacher not found")
 			return
 		}
+		middleware.LogHandlerError(r, "failed to update teacher", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to update teacher")
 		return
 	}
@@ -160,14 +177,17 @@ func (h *TeachersHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Tags teachers
 // @Produce json
 // @Param id path int true "Teacher ID"
+// @Security BearerAuth
 // @Success 200 {object} messageResponse
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /teachers/{id} [delete]
 func (h *TeachersHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid teacher id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid teacher id")
 		return
 	}
@@ -175,9 +195,11 @@ func (h *TeachersHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Delete(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			middleware.LogHandlerError(r, "teacher not found", err)
 			_ = writeJSONError(w, http.StatusNotFound, "teacher not found")
 			return
 		}
+		middleware.LogHandlerError(r, "failed to delete teacher", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to delete teacher")
 		return
 	}

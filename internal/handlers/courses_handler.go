@@ -7,6 +7,7 @@ import (
 
 	"go-uni/internal/models"
 	"go-uni/internal/repository"
+	"go-uni/pkg/middleware"
 )
 
 type CoursesHandler struct {
@@ -28,6 +29,7 @@ func NewCoursesHandler(repo *repository.CoursesRepository) *CoursesHandler {
 func (h *CoursesHandler) List(w http.ResponseWriter, r *http.Request) {
 	courses, err := h.repo.GetAll(r.Context())
 	if err != nil {
+		middleware.LogHandlerError(r, "failed to list courses", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to list courses")
 		return
 	}
@@ -49,16 +51,19 @@ func (h *CoursesHandler) List(w http.ResponseWriter, r *http.Request) {
 func (h *CoursesHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid course id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid course id")
 		return
 	}
 
 	course, getErr := h.repo.GetByID(r.Context(), id)
 	if getErr != nil {
+		middleware.LogHandlerError(r, "failed to get course", getErr)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to get course")
 		return
 	}
 	if course == nil {
+		middleware.LogHandlerError(r, "course not found", nil)
 		_ = writeJSONError(w, http.StatusNotFound, "course not found")
 		return
 	}
@@ -73,13 +78,16 @@ func (h *CoursesHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param request body models.CreateUpdateCourseRequest true "Course payload"
+// @Security BearerAuth
 // @Success 201 {object} models.Course
 // @Failure 400 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /courses [post]
 func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateUpdateCourseRequest
 	if err := readJSON(w, r, &req); err != nil {
+		middleware.LogHandlerError(r, "invalid JSON body", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
@@ -91,11 +99,13 @@ func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if validationErr := validateCourse(course); validationErr != nil {
+		middleware.LogHandlerError(r, "course validation failed", validationErr)
 		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
 
 	if err := h.repo.Create(r.Context(), &course); err != nil {
+		middleware.LogHandlerError(r, "failed to create course", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to create course")
 		return
 	}
@@ -111,20 +121,24 @@ func (h *CoursesHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path int true "Course ID"
 // @Param request body models.CreateUpdateCourseRequest true "Course payload"
+// @Security BearerAuth
 // @Success 200 {object} models.Course
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /courses/{id} [put]
 func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid course id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid course id")
 		return
 	}
 
 	var req models.CreateUpdateCourseRequest
 	if err := readJSON(w, r, &req); err != nil {
+		middleware.LogHandlerError(r, "invalid JSON body", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
@@ -137,6 +151,7 @@ func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if validationErr := validateCourse(course); validationErr != nil {
+		middleware.LogHandlerError(r, "course validation failed", validationErr)
 		_ = writeJSONError(w, http.StatusBadRequest, validationErr.Error())
 		return
 	}
@@ -144,9 +159,11 @@ func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Update(r.Context(), course)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			middleware.LogHandlerError(r, "course not found", err)
 			_ = writeJSONError(w, http.StatusNotFound, "course not found")
 			return
 		}
+		middleware.LogHandlerError(r, "failed to update course", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to update course")
 		return
 	}
@@ -160,14 +177,17 @@ func (h *CoursesHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Tags courses
 // @Produce json
 // @Param id path int true "Course ID"
+// @Security BearerAuth
 // @Success 200 {object} messageResponse
 // @Failure 400 {object} errorResponse
 // @Failure 404 {object} errorResponse
+// @Failure 401 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Router /courses/{id} [delete]
 func (h *CoursesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r, "id")
 	if err != nil {
+		middleware.LogHandlerError(r, "invalid course id", err)
 		_ = writeJSONError(w, http.StatusBadRequest, "invalid course id")
 		return
 	}
@@ -175,9 +195,11 @@ func (h *CoursesHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	err = h.repo.Delete(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			middleware.LogHandlerError(r, "course not found", err)
 			_ = writeJSONError(w, http.StatusNotFound, "course not found")
 			return
 		}
+		middleware.LogHandlerError(r, "failed to delete course", err)
 		_ = writeJSONError(w, http.StatusInternalServerError, "failed to delete course")
 		return
 	}

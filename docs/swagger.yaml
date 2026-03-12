@@ -10,6 +10,25 @@ definitions:
       message:
         type: string
     type: object
+  handlers.tokenRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handlers.tokenResponse:
+    properties:
+      expires_at:
+        type: string
+      token:
+        type: string
+      token_type:
+        type: string
+    type: object
   models.Course:
     properties:
       description:
@@ -103,6 +122,40 @@ info:
   title: go-uni API
   version: "1.0"
 paths:
+  /auth/token:
+    post:
+      consumes:
+      - application/json
+      description: Issues JWT token for authenticated API access.
+      parameters:
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.tokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.tokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
+      summary: Issue auth token
+      tags:
+      - auth
   /courses:
     get:
       description: Returns all courses.
@@ -144,10 +197,16 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Create course
       tags:
       - courses
@@ -171,6 +230,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "404":
           description: Not Found
           schema:
@@ -179,6 +242,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete course
       tags:
       - courses
@@ -239,6 +304,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "404":
           description: Not Found
           schema:
@@ -247,6 +316,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Update course
       tags:
       - courses
@@ -291,10 +362,16 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Create student
       tags:
       - students
@@ -318,6 +395,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "404":
           description: Not Found
           schema:
@@ -326,6 +407,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete student
       tags:
       - students
@@ -386,6 +469,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "404":
           description: Not Found
           schema:
@@ -394,6 +481,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Update student
       tags:
       - students
@@ -422,6 +511,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "404":
           description: Not Found
           schema:
@@ -430,6 +523,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Unenroll student from course
       tags:
       - enrollments
@@ -457,10 +552,16 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Enroll student to course
       tags:
       - enrollments
@@ -505,10 +606,16 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Create teacher
       tags:
       - teachers
@@ -532,6 +639,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "404":
           description: Not Found
           schema:
@@ -540,6 +651,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete teacher
       tags:
       - teachers
@@ -600,6 +713,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.errorResponse'
         "404":
           description: Not Found
           schema:
@@ -608,7 +725,15 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Update teacher
       tags:
       - teachers
+securityDefinitions:
+  BearerAuth:
+    description: 'Use format: Bearer {token}'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
