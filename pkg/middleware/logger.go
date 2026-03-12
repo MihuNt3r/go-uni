@@ -35,4 +35,3 @@ func LogHandlerError(r *http.Request, message string, err error) {
 
 	log.Printf("handler error method=%s path=%s msg=%s err=%v", r.Method, r.URL.Path, message, err)
 }
-
