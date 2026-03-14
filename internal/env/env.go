@@ -3,7 +3,22 @@ package env
 import (
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
+
+func init() {
+	loadDotEnv()
+}
+
+func loadDotEnv() {
+	// Try common locations so env vars work whether app is started from repo root or cmd/server.
+	for _, path := range []string{".env", "../.env", "../../.env"} {
+		if err := godotenv.Load(path); err == nil {
+			return
+		}
+	}
+}
 
 func GetString(key, fallback string) string {
 	val, ok := os.LookupEnv(key)

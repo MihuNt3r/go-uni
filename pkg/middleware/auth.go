@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,7 +16,7 @@ type AuthConfig struct {
 func AuthMiddleware(cfg AuthConfig) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if isValidJWT(cfg.JWTSecret, bearerTokenFromHeader(r.Header.Get("Authorization"))) {
+			if isValidJWT(cfg.JWTSecret, r.Header.Get("Authorization")) {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -59,15 +58,6 @@ func isValidJWT(secret, tokenString string) bool {
 	}
 
 	return token.Valid
-}
-
-func bearerTokenFromHeader(headerValue string) string {
-	const bearerPrefix = "Bearer "
-	if !strings.HasPrefix(headerValue, bearerPrefix) {
-		return ""
-	}
-
-	return strings.TrimSpace(strings.TrimPrefix(headerValue, bearerPrefix))
 }
 
 func writeJSONError(w http.ResponseWriter, status int, message string) {
